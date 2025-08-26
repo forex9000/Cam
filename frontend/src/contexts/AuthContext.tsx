@@ -2,6 +2,32 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
+// Storage utility that works on both web and mobile
+const storage = {
+  async getItem(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    }
+    return AsyncStorage.getItem(key);
+  },
+  
+  async setItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+      return Promise.resolve();
+    }
+    return AsyncStorage.setItem(key, value);
+  },
+  
+  async removeItem(key: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+      return Promise.resolve();
+    }
+    return AsyncStorage.removeItem(key);
+  }
+};
+
 interface User {
   id: string;
   email: string;
