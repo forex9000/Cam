@@ -107,39 +107,51 @@ user_problem_statement: "Android app that records videos with automatic phone de
 backend:
   - task: "User Authentication System"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented complete JWT-based auth with registration, login, and user endpoints"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - All authentication endpoints working correctly. POST /api/register returns JWT token, POST /api/login authenticates users, GET /api/me returns user info with valid JWT. Error handling works for invalid credentials (401) and missing auth (403)."
 
   - task: "Video Upload API"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented video upload endpoint with base64 storage, location, and metadata"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - POST /api/videos/upload successfully accepts base64 video data, location coordinates (lat/lng), and phone number. Returns video_id for uploaded video. Requires valid JWT authentication."
 
   - task: "Video Management APIs"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented get videos list, get single video, and delete video endpoints"
+      - working: false
+        agent: "testing"
+        comment: "❌ FAILED - GET /api/videos/{video_id} returned 500 error due to MongoDB ObjectId serialization issue"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Fixed ObjectId serialization issue. All video management APIs working: GET /api/videos lists user videos (metadata only), GET /api/videos/{id} returns full video data, DELETE /api/videos/{id} removes video. Proper 404 errors for non-existent videos."
 
 frontend:
   - task: "Authentication Flow"
