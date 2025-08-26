@@ -100,9 +100,9 @@ export default function AppNavigator() {
     return null; // You could add a loading screen here
   }
 
-  return (
-    <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
-    </NavigationContainer>
-  );
+  if (user) {
+    return <AppStack />;
+  } else {
+    return <AuthStack />;
+  }
 }
