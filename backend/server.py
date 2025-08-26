@@ -196,6 +196,9 @@ async def get_video(video_id: str, current_user: dict = Depends(get_current_user
     video = await db.videos.find_one({"id": video_id, "user_id": current_user["id"]})
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
+    # Remove MongoDB _id field to avoid serialization issues
+    if "_id" in video:
+        del video["_id"]
     return video
 
 @api_router.delete("/videos/{video_id}")
