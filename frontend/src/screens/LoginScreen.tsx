@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import RegisterScreen from './RegisterScreen';
 
 interface LoginScreenProps {
   navigation: any;
