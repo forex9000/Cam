@@ -109,7 +109,6 @@ export default function CameraScreen() {
         setIsRecording(true);
         const video = await cameraRef.current.recordAsync({
           maxDuration: 30, // 30 second limit
-          quality: '720p',
         });
         
         if (video) {
