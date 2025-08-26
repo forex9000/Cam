@@ -66,7 +66,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthState = async () => {
     try {
-      const storedToken = await AsyncStorage.getItem('auth_token');
+      const storedToken = await storage.getItem('auth_token');
       if (storedToken) {
         setToken(storedToken);
         await fetchCurrentUser(storedToken);
