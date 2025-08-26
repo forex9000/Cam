@@ -18,7 +18,8 @@ import { useAuth } from '../contexts/AuthContext';
 const { width, height } = Dimensions.get('window');
 
 export default function CameraScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [microphonePermission, requestMicrophonePermission] = useMicrophonePermissions();
   const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
   const [type, setType] = useState<CameraType>('back');
   const [isRecording, setIsRecording] = useState(false);
@@ -31,18 +32,21 @@ export default function CameraScreen() {
   }, []);
 
   const getPermissions = async () => {
-    // Camera permission
-    const cameraStatus = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(cameraStatus.status === 'granted');
+    // Camera permission (handled by hooks)
+    if (!cameraPermission?.granted) {
+      await requestCameraPermission();
+    }
 
-    // Microphone permission
-    const microphoneStatus = await Camera.requestMicrophonePermissionsAsync();
+    // Microphone permission (handled by hooks)  
+    if (!microphonePermission?.granted) {
+      await requestMicrophonePermission();
+    }
     
     // Location permission
     const locationStatus = await Location.requestForegroundPermissionsAsync();
     setLocationPermission(locationStatus.status === 'granted');
 
-    if (cameraStatus.status !== 'granted') {
+    if (!cameraPermission?.granted) {
       Alert.alert('Permission needed', 'Camera permission is required to record videos');
     }
     
