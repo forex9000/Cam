@@ -23,8 +23,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const { login } = useAuth();
+
+  if (showRegister) {
+    return <RegisterScreen navigation={{ navigate: () => setShowRegister(false) }} />;
+  }
 
   const handleLogin = async () => {
     if (!email || !password) {
