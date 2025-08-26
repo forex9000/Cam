@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, CameraType, CameraView } from 'expo-camera';
+import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 import { Ionicons } from '@expo/vector-icons';
