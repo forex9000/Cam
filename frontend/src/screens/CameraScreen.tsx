@@ -104,7 +104,7 @@ export default function CameraScreen() {
   };
 
   const startRecording = async () => {
-    if (cameraRef.current && hasPermission) {
+    if (cameraRef.current && cameraPermission?.granted) {
       try {
         setIsRecording(true);
         const video = await cameraRef.current.recordAsync({
