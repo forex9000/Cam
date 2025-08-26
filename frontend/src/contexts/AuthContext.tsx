@@ -112,6 +112,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const register = async (email: string, password: string, phone?: string) => {
     try {
+      console.log('🔄 Attempting registration for:', email);
+      console.log('🔄 API_BASE_URL:', API_BASE_URL);
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
         headers: {
@@ -120,21 +122,27 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         body: JSON.stringify({ email, password, phone }),
       });
 
+      console.log('📡 Register response status:', response.status);
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('❌ Registration failed:', errorData);
         throw new Error(errorData.detail || 'Registration failed');
       }
 
       const { access_token } = await response.json();
+      console.log('✅ Registration successful, got token');
       
       // Store token securely
       await AsyncStorage.setItem('auth_token', access_token);
       setToken(access_token);
+      console.log('💾 Token stored');
       
       // Fetch user data
       await fetchCurrentUser(access_token);
+      console.log('👤 User data fetched');
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       throw error;
     }
   };
