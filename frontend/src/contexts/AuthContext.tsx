@@ -74,6 +74,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('🔄 Attempting login for:', email);
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: {
@@ -82,21 +83,27 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('📡 Login response status:', response.status);
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('❌ Login failed:', errorData);
         throw new Error(errorData.detail || 'Login failed');
       }
 
       const { access_token } = await response.json();
+      console.log('✅ Login successful, got token');
       
       // Store token securely
       await AsyncStorage.setItem('auth_token', access_token);
       setToken(access_token);
+      console.log('💾 Token stored');
       
       // Fetch user data
       await fetchCurrentUser(access_token);
+      console.log('👤 User data fetched');
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       throw error;
     }
   };
