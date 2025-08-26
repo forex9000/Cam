@@ -208,7 +208,7 @@ export default function CameraScreen() {
     );
   }
 
-  if (cameraPermission === false || !cameraPermission?.granted) {
+  if (!cameraPermission?.granted) {
     return (
       <View style={styles.permissionContainer}>
         <Ionicons name="camera-outline" size={64} color="#ccc" />
