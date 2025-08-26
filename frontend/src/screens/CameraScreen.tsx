@@ -200,7 +200,7 @@ export default function CameraScreen() {
     return response.json();
   };
 
-  if (hasPermission === null) {
+  if (cameraPermission === null) {
     return (
       <View style={styles.permissionContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -209,7 +209,7 @@ export default function CameraScreen() {
     );
   }
 
-  if (hasPermission === false) {
+  if (cameraPermission === false || !cameraPermission?.granted) {
     return (
       <View style={styles.permissionContainer}>
         <Ionicons name="camera-outline" size={64} color="#ccc" />
