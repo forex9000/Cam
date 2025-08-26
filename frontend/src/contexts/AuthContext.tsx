@@ -160,7 +160,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       console.log('✅ Registration successful, got token');
       
       // Store token securely
-      await AsyncStorage.setItem('auth_token', access_token);
+      await storage.setItem('auth_token', access_token);
       setToken(access_token);
       console.log('💾 Token stored');
       
