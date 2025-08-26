@@ -175,7 +175,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('auth_token');
+      await storage.removeItem('auth_token');
       setToken(null);
       setUser(null);
     } catch (error) {
