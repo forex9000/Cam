@@ -30,30 +30,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   const { register } = useAuth();
 
-  // Try to auto-detect device info on mount
-  useEffect(() => {
-    detectDeviceInfo();
-  }, []);
-
-  const detectDeviceInfo = async () => {
-    try {
-      // Note: Actual phone number detection is very limited on modern devices
-      // This is more for device identification
-      const deviceName = Device.deviceName || 'Unknown Device';
-      const modelName = Device.modelName || 'Unknown Model';
-      
-      // For demo purposes, we'll show a simulated phone detection
-      // In real apps, you'd need special permissions and carrier integration
-      console.log('Device Info:', { deviceName, modelName });
-      
-      // You could potentially use device info to suggest a phone format
-      // but actual phone number detection requires special telecom permissions
-      
-    } catch (error) {
-      console.log('Device detection failed:', error);
-    }
-  };
-
   const handleRegister = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Email and password are required');
