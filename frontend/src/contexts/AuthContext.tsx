@@ -90,7 +90,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const { access_token } = await response.json();
       
       // Store token securely
-      await SecureStore.setItemAsync('auth_token', access_token);
+      await AsyncStorage.setItem('auth_token', access_token);
       setToken(access_token);
       
       // Fetch user data
