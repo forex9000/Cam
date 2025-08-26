@@ -8,18 +8,24 @@ import MainApp from '../src/components/MainApp';
 function AppContent() {
   const { user, loading } = useAuth();
 
+  console.log('🔍 AppContent - user:', user, 'loading:', loading);
+
   if (loading) {
+    console.log('⏳ Still loading...');
     return <View style={styles.container} />;
   }
 
   if (!user) {
+    console.log('👤 No user, showing LoginScreen');
     return <LoginScreen navigation={null} />;
   }
 
+  console.log('✅ User found, showing MainApp');
   return <MainApp />;
 }
 
 export default function Index() {
+  console.log('🚀 App starting...');
   return (
     <SafeAreaProvider>
       <AuthProvider>
