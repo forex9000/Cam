@@ -110,7 +110,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             <TouchableOpacity 
               style={styles.registerLink}
-              onPress={() => navigation.navigate('Register')}
+              onPress={() => setShowRegister(true)}
             >
               <Text style={styles.registerText}>
                 Don't have an account? <Text style={styles.registerTextBold}>Sign Up</Text>
