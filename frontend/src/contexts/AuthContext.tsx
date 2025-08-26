@@ -132,7 +132,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await SecureStore.deleteItemAsync('auth_token');
+      await AsyncStorage.removeItem('auth_token');
       setToken(null);
       setUser(null);
     } catch (error) {
