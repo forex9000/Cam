@@ -31,6 +31,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  console.log('🔧 AuthProvider initialized, API_BASE_URL:', API_BASE_URL);
+
   // Check for existing token on app start
   useEffect(() => {
     checkAuthState();
