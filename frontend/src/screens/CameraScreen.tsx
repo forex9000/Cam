@@ -32,26 +32,34 @@ export default function CameraScreen() {
   }, []);
 
   const getPermissions = async () => {
+    console.log('🔐 Requesting permissions...');
+    
     // Camera permission (handled by hooks)
     if (!cameraPermission?.granted) {
-      await requestCameraPermission();
+      console.log('📷 Requesting camera permission...');
+      const result = await requestCameraPermission();
+      console.log('📷 Camera permission result:', result);
     }
 
     // Microphone permission (handled by hooks)  
     if (!microphonePermission?.granted) {
-      await requestMicrophonePermission();
+      console.log('🎤 Requesting microphone permission...');
+      const result = await requestMicrophonePermission();
+      console.log('🎤 Microphone permission result:', result);
     }
     
     // Location permission
+    console.log('📍 Requesting location permission...');
     const locationStatus = await Location.requestForegroundPermissionsAsync();
     setLocationPermission(locationStatus.status === 'granted');
+    console.log('📍 Location permission result:', locationStatus.status);
 
     if (!cameraPermission?.granted) {
-      Alert.alert('Permission needed', 'Camera permission is required to record videos');
+      Alert.alert('إذن مطلوب', 'يحتاج التطبيق إذن الكاميرا لتسجيل الفيديو');
     }
     
     if (locationStatus.status !== 'granted') {
-      Alert.alert('Location Permission', 'Location permission helps add location data to your videos');
+      Alert.alert('إذن الموقع', 'إذن الموقع يساعد في إضافة بيانات الموقع للفيديوهات');
     }
   };
 
