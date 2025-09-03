@@ -104,22 +104,37 @@ export default function CameraScreen() {
   };
 
   const startRecording = async () => {
+    console.log('🎬 Attempting to start recording...');
+    console.log('📹 Camera permission:', cameraPermission?.granted);
+    console.log('🎤 Microphone permission:', microphonePermission?.granted);
+    
     if (cameraRef.current && cameraPermission?.granted) {
       try {
+        console.log('🔴 Starting video recording...');
         setIsRecording(true);
+        
         const video = await cameraRef.current.recordAsync({
-          maxDuration: 30, // 30 second limit
+          maxDuration: 30000, // 30 seconds in milliseconds
+          quality: 'medium',
         });
         
-        if (video) {
+        console.log('✅ Recording completed:', video);
+        
+        if (video && video.uri) {
           await handleVideoRecorded(video.uri);
+        } else {
+          console.error('❌ No video URI received');
+          Alert.alert('خطأ', 'لم يتم إنشاء الفيديو بشكل صحيح');
         }
       } catch (error) {
-        console.error('Recording error:', error);
-        Alert.alert('Recording Error', 'Failed to record video');
+        console.error('❌ Recording error:', error);
+        Alert.alert('خطأ في التسجيل', `فشل في تسجيل الفيديو: ${error.message}`);
       } finally {
         setIsRecording(false);
       }
+    } else {
+      console.error('❌ Camera permission not granted or ref not available');
+      Alert.alert('خطأ', 'لا يمكن الوصول للكاميرا. تأكد من منح الأذونات.');
     }
   };
 
