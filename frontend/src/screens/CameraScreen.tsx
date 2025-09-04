@@ -24,6 +24,7 @@ export default function CameraScreen() {
   const [type, setType] = useState<CameraType>('back');
   const [isRecording, setIsRecording] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
   const cameraRef = useRef<CameraView>(null);
   const { user, token } = useAuth();
 
