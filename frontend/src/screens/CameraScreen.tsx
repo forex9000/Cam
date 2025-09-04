@@ -328,7 +328,17 @@ export default function CameraScreen() {
             ) : (
               <TouchableOpacity
                 style={[styles.recordButton, isRecording && styles.recordingButton]}
-                onPress={isRecording ? stopRecording : startRecording}
+                onPress={() => {
+                  console.log('🔴 Record button pressed!');
+                  console.log('🔄 Current recording state:', isRecording);
+                  if (isRecording) {
+                    console.log('🛑 Calling stopRecording');
+                    stopRecording();
+                  } else {
+                    console.log('🎬 Calling startRecording');
+                    startRecording();
+                  }
+                }}
               >
                 <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
               </TouchableOpacity>
