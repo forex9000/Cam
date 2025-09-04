@@ -113,61 +113,58 @@ export default function CameraScreen() {
   };
 
   const startRecording = async () => {
-    console.log('🎬 Attempting to start recording...');
-    console.log('📹 Camera permission:', cameraPermission?.granted);
-    console.log('🎤 Microphone permission:', microphonePermission?.granted);
+    console.log('🎬 === START RECORDING FUNCTION CALLED ===');
     
-    if (cameraRef.current && cameraPermission?.granted && microphonePermission?.granted) {
-      try {
-        console.log('🔴 Starting video recording...');
-        setIsRecording(true);
-        
-        // Auto-stop after 30 seconds
-        const timer = setTimeout(() => {
-          console.log('⏰ Auto-stopping recording after 30 seconds');
-          stopRecording();
-        }, 30000);
-        setRecordingTimer(timer);
-        
-        // Use the new API without parameters - options are set on the component
-        const video = await cameraRef.current.recordAsync();
-        
-        console.log('✅ Recording completed:', video);
-        
-        // Clear the timer since recording finished
-        if (recordingTimer) {
-          clearTimeout(recordingTimer);
-          setRecordingTimer(null);
-        }
-        
-        if (video && video.uri) {
-          console.log('📹 Video URI:', video.uri);
-          await handleVideoRecorded(video.uri);
-        } else {
-          console.error('❌ No video URI received');
-          Alert.alert('خطأ', 'لم يتم إنشاء الفيديو بشكل صحيح');
-        }
-      } catch (error) {
-        console.error('❌ Recording error:', error);
-        Alert.alert('خطأ في التسجيل', `فشل في تسجيل الفيديو: ${error.message}`);
-        
-        // Clear timer on error
-        if (recordingTimer) {
-          clearTimeout(recordingTimer);
-          setRecordingTimer(null);
-        }
-      } finally {
-        setIsRecording(false);
-      }
-    } else {
-      if (!cameraPermission?.granted) {
-        Alert.alert('خطأ', 'يجب منح إذن الكاميرا لتسجيل الفيديو');
-      } else if (!microphonePermission?.granted) {
-        Alert.alert('خطأ', 'يجب منح إذن الميكروفون لتسجيل الصوت');
+    // Check basic states
+    console.log('📹 Camera permission granted:', cameraPermission?.granted);
+    console.log('🎤 Microphone permission granted:', microphonePermission?.granted);
+    console.log('📷 Camera ref exists:', !!cameraRef.current);
+    console.log('🔄 Currently recording:', isRecording);
+    
+    // Simple permission check
+    if (!cameraPermission?.granted) {
+      console.log('❌ Camera permission not granted');
+      Alert.alert('خطأ', 'يجب منح إذن الكاميرا أولاً');
+      return;
+    }
+    
+    if (!microphonePermission?.granted) {
+      console.log('❌ Microphone permission not granted');
+      Alert.alert('خطأ', 'يجب منح إذن الميكروفون أولاً');
+      return;
+    }
+    
+    if (!cameraRef.current) {
+      console.log('❌ Camera ref is null');
+      Alert.alert('خطأ', 'الكاميرا غير جاهزة');
+      return;
+    }
+    
+    try {
+      console.log('🔴 Setting recording state to true...');
+      setIsRecording(true);
+      
+      console.log('🎥 Calling cameraRef.current.recordAsync()...');
+      const video = await cameraRef.current.recordAsync();
+      
+      console.log('✅ Recording completed successfully!');
+      console.log('📹 Video object:', video);
+      
+      if (video?.uri) {
+        console.log('🎯 Video URI exists:', video.uri);
+        Alert.alert('نجح!', 'تم تسجيل الفيديو بنجاح');
+        await handleVideoRecorded(video.uri);
       } else {
-        Alert.alert('خطأ', 'لا يمكن الوصول للكاميرا');
+        console.log('❌ No video URI in result');
+        Alert.alert('خطأ', 'لم يتم إنشاء ملف الفيديو');
       }
-      console.error('❌ Missing permissions or camera ref');
+      
+    } catch (error) {
+      console.log('❌ Recording error:', error);
+      Alert.alert('خطأ', `فشل التسجيل: ${error.message}`);
+    } finally {
+      console.log('🔄 Setting recording state to false...');
+      setIsRecording(false);
     }
   };
 
