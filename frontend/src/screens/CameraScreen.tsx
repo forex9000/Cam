@@ -122,10 +122,23 @@ export default function CameraScreen() {
         console.log('🔴 Starting video recording...');
         setIsRecording(true);
         
+        // Auto-stop after 30 seconds
+        const timer = setTimeout(() => {
+          console.log('⏰ Auto-stopping recording after 30 seconds');
+          stopRecording();
+        }, 30000);
+        setRecordingTimer(timer);
+        
         // Use the new API without parameters - options are set on the component
         const video = await cameraRef.current.recordAsync();
         
         console.log('✅ Recording completed:', video);
+        
+        // Clear the timer since recording finished
+        if (recordingTimer) {
+          clearTimeout(recordingTimer);
+          setRecordingTimer(null);
+        }
         
         if (video && video.uri) {
           console.log('📹 Video URI:', video.uri);
@@ -137,6 +150,12 @@ export default function CameraScreen() {
       } catch (error) {
         console.error('❌ Recording error:', error);
         Alert.alert('خطأ في التسجيل', `فشل في تسجيل الفيديو: ${error.message}`);
+        
+        // Clear timer on error
+        if (recordingTimer) {
+          clearTimeout(recordingTimer);
+          setRecordingTimer(null);
+        }
       } finally {
         setIsRecording(false);
       }
@@ -153,8 +172,15 @@ export default function CameraScreen() {
   };
 
   const stopRecording = () => {
+    console.log('🛑 Stopping recording...');
     if (cameraRef.current && isRecording) {
       cameraRef.current.stopRecording();
+      
+      // Clear timer
+      if (recordingTimer) {
+        clearTimeout(recordingTimer);
+        setRecordingTimer(null);
+      }
     }
   };
 
