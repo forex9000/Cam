@@ -323,22 +323,31 @@ export default function CameraScreen() {
                 <Text style={styles.uploadingText}>Uploading video...</Text>
               </View>
             ) : (
-              <TouchableOpacity
-                style={[styles.recordButton, isRecording && styles.recordingButton]}
-                onPress={() => {
-                  console.log('🔴 Record button pressed!');
-                  console.log('🔄 Current recording state:', isRecording);
-                  if (isRecording) {
-                    console.log('🛑 Calling stopRecording');
-                    stopRecording();
-                  } else {
-                    console.log('🎬 Calling startRecording');
-                    startRecording();
-                  }
-                }}
-              >
-                <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
-              </TouchableOpacity>
+              <View style={styles.recordButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.recordButton, isRecording && styles.recordingButton]}
+                  onPress={() => {
+                    console.log('🔴 BUTTON PRESSED!');
+                    Alert.alert('Test', 'Button works!');
+                    if (isRecording) {
+                      stopRecording();
+                    } else {
+                      startRecording();
+                    }
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
+                </TouchableOpacity>
+                
+                {/* Test button */}
+                <TouchableOpacity 
+                  style={styles.testButton}
+                  onPress={() => Alert.alert('Test', 'This button works!')}
+                >
+                  <Text style={styles.testButtonText}>TEST</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         </View>
