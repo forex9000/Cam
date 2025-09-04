@@ -116,19 +116,18 @@ export default function CameraScreen() {
     console.log('📹 Camera permission:', cameraPermission?.granted);
     console.log('🎤 Microphone permission:', microphonePermission?.granted);
     
-    if (cameraRef.current && cameraPermission?.granted) {
+    if (cameraRef.current && cameraPermission?.granted && microphonePermission?.granted) {
       try {
         console.log('🔴 Starting video recording...');
         setIsRecording(true);
         
-        const video = await cameraRef.current.recordAsync({
-          maxDuration: 30000, // 30 seconds in milliseconds
-          quality: 'medium',
-        });
+        // Use the new API without parameters - options are set on the component
+        const video = await cameraRef.current.recordAsync();
         
         console.log('✅ Recording completed:', video);
         
         if (video && video.uri) {
+          console.log('📹 Video URI:', video.uri);
           await handleVideoRecorded(video.uri);
         } else {
           console.error('❌ No video URI received');
@@ -141,8 +140,14 @@ export default function CameraScreen() {
         setIsRecording(false);
       }
     } else {
-      console.error('❌ Camera permission not granted or ref not available');
-      Alert.alert('خطأ', 'لا يمكن الوصول للكاميرا. تأكد من منح الأذونات.');
+      if (!cameraPermission?.granted) {
+        Alert.alert('خطأ', 'يجب منح إذن الكاميرا لتسجيل الفيديو');
+      } else if (!microphonePermission?.granted) {
+        Alert.alert('خطأ', 'يجب منح إذن الميكروفون لتسجيل الصوت');
+      } else {
+        Alert.alert('خطأ', 'لا يمكن الوصول للكاميرا');
+      }
+      console.error('❌ Missing permissions or camera ref');
     }
   };
 
