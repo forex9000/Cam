@@ -274,84 +274,97 @@ export default function CameraScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CameraView 
-        ref={cameraRef}
-        style={styles.camera} 
-        facing={type}
-        mode="video"
-        videoQuality="720p"
-      >
-        <View style={styles.overlay}>
-          {/* Top Controls */}
-          <View style={styles.topControls}>
-            <TouchableOpacity
-              style={styles.flipButton}
-              onPress={() => setType(type === 'back' ? 'front' : 'back')}
-            >
-              <Ionicons name="camera-reverse-outline" size={32} color="white" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Status Indicators */}
-          <View style={styles.statusContainer}>
-            {locationPermission ? (
-              <View style={styles.statusItem}>
-                <Ionicons name="location" size={16} color="#4CAF50" />
-                <Text style={styles.statusText}>Location ON</Text>
-              </View>
-            ) : (
-              <View style={styles.statusItem}>
-                <Ionicons name="location-outline" size={16} color="#FF9800" />
-                <Text style={styles.statusText}>Location OFF</Text>
-              </View>
-            )}
-          </View>
-
-          {/* Recording Indicator */}
-          {isRecording && (
-            <View style={styles.recordingIndicator}>
-              <View style={styles.recordingDot} />
-              <Text style={styles.recordingText}>REC</Text>
+      <View style={styles.cameraContainer}>
+        <CameraView 
+          ref={cameraRef}
+          style={styles.camera} 
+          facing={type}
+          mode="video"
+          videoQuality="720p"
+        >
+          <View style={styles.overlay}>
+            {/* Top Controls */}
+            <View style={styles.topControls}>
+              <TouchableOpacity
+                style={styles.flipButton}
+                onPress={() => setType(type === 'back' ? 'front' : 'back')}
+              >
+                <Ionicons name="camera-reverse-outline" size={32} color="white" />
+              </TouchableOpacity>
             </View>
-          )}
 
-          {/* Bottom Controls */}
-          <View style={styles.bottomControls}>
-            {uploadingVideo ? (
-              <View style={styles.uploadingContainer}>
-                <ActivityIndicator size="large" color="white" />
-                <Text style={styles.uploadingText}>Uploading video...</Text>
-              </View>
-            ) : (
-              <View style={styles.recordButtonContainer}>
-                <TouchableOpacity
-                  style={[styles.recordButton, isRecording && styles.recordingButton]}
-                  onPress={() => {
-                    console.log('🔴 BUTTON PRESSED!');
-                    Alert.alert('Test', 'Button works!');
-                    if (isRecording) {
-                      stopRecording();
-                    } else {
-                      startRecording();
-                    }
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
-                </TouchableOpacity>
-                
-                {/* Test button */}
-                <TouchableOpacity 
-                  style={styles.testButton}
-                  onPress={() => Alert.alert('Test', 'This button works!')}
-                >
-                  <Text style={styles.testButtonText}>TEST</Text>
-                </TouchableOpacity>
+            {/* Status Indicators */}
+            <View style={styles.statusContainer}>
+              {locationPermission ? (
+                <View style={styles.statusItem}>
+                  <Ionicons name="location" size={16} color="#4CAF50" />
+                  <Text style={styles.statusText}>Location ON</Text>
+                </View>
+              ) : (
+                <View style={styles.statusItem}>
+                  <Ionicons name="location-outline" size={16} color="#FF9800" />
+                  <Text style={styles.statusText}>Location OFF</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Recording Indicator */}
+            {isRecording && (
+              <View style={styles.recordingIndicator}>
+                <View style={styles.recordingDot} />
+                <Text style={styles.recordingText}>REC</Text>
               </View>
             )}
           </View>
-        </View>
-      </CameraView>
+        </CameraView>
+      </View>
+
+      {/* Bottom Controls - OUTSIDE CameraView */}
+      <View style={styles.bottomControlsExternal}>
+        {uploadingVideo ? (
+          <View style={styles.uploadingContainer}>
+            <ActivityIndicator size="large" color="#FF4444" />
+            <Text style={styles.uploadingText}>جاري رفع الفيديو...</Text>
+          </View>
+        ) : (
+          <View style={styles.controlsContainer}>
+            {/* Test Button */}
+            <TouchableOpacity 
+              style={styles.testButton}
+              onPress={() => {
+                console.log('🔵 TEST BUTTON PRESSED!');
+                Alert.alert('اختبار', 'الزر يعمل بشكل صحيح!');
+              }}
+            >
+              <Text style={styles.testButtonText}>اختبار</Text>
+            </TouchableOpacity>
+            
+            {/* Record Button */}
+            <TouchableOpacity
+              style={[styles.recordButton, isRecording && styles.recordingButton]}
+              onPress={() => {
+                console.log('🔴 RECORD BUTTON PRESSED!');
+                Alert.alert('تسجيل', 'تم الضغط على زر التسجيل!');
+                if (isRecording) {
+                  console.log('🛑 Stopping recording...');
+                  stopRecording();
+                } else {
+                  console.log('🎬 Starting recording...');
+                  startRecording();
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
+            </TouchableOpacity>
+            
+            {/* Info Text */}
+            <Text style={styles.infoText}>
+              {isRecording ? 'اضغط لإيقاف التسجيل' : 'اضغط للبدء بالتسجيل'}
+            </Text>
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
