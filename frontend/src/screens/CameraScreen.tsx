@@ -24,7 +24,6 @@ export default function CameraScreen() {
   const [type, setType] = useState<CameraType>('back');
   const [isRecording, setIsRecording] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
-  const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
   const cameraRef = useRef<CameraView>(null);
   const { user, token } = useAuth();
 
@@ -35,25 +34,19 @@ export default function CameraScreen() {
   const getPermissions = async () => {
     console.log('🔐 Requesting permissions...');
     
-    // Camera permission (handled by hooks)
     if (!cameraPermission?.granted) {
       console.log('📷 Requesting camera permission...');
-      const result = await requestCameraPermission();
-      console.log('📷 Camera permission result:', result);
+      await requestCameraPermission();
     }
 
-    // Microphone permission (handled by hooks)  
     if (!microphonePermission?.granted) {
       console.log('🎤 Requesting microphone permission...');
-      const result = await requestMicrophonePermission();
-      console.log('🎤 Microphone permission result:', result);
+      await requestMicrophonePermission();
     }
     
-    // Location permission
     console.log('📍 Requesting location permission...');
     const locationStatus = await Location.requestForegroundPermissionsAsync();
     setLocationPermission(locationStatus.status === 'granted');
-    console.log('📍 Location permission result:', locationStatus.status);
 
     if (!cameraPermission?.granted) {
       Alert.alert('إذن مطلوب', 'يحتاج التطبيق إذن الكاميرا لتسجيل الفيديو');
@@ -66,22 +59,16 @@ export default function CameraScreen() {
 
   const getDevicePhoneNumber = async () => {
     try {
-      // Note: Modern Android/iOS severely restrict phone number access
-      // This is a fallback that tries different approaches
-      
-      // Method 1: User's stored phone (from registration)
       if (user?.phone) {
         return user.phone;
       }
 
-      // Method 2: Device model as identifier (not a phone number but device info)
       const deviceInfo = {
         model: Device.modelName || 'Unknown',
         brand: Device.brand || 'Unknown',
         osVersion: Device.osVersion || 'Unknown'
       };
       
-      // For demo purposes, return device info or ask user to update profile
       return `Device: ${deviceInfo.model} (${deviceInfo.brand})`;
       
     } catch (error) {
@@ -98,8 +85,6 @@ export default function CameraScreen() {
       
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000,
-        distanceInterval: 1,
       });
       
       return {
@@ -112,86 +97,13 @@ export default function CameraScreen() {
     }
   };
 
-  const startRecording = async () => {
-    console.log('🎬 === START RECORDING FUNCTION CALLED ===');
-    
-    // Check basic states
-    console.log('📹 Camera permission granted:', cameraPermission?.granted);
-    console.log('🎤 Microphone permission granted:', microphonePermission?.granted);
-    console.log('📷 Camera ref exists:', !!cameraRef.current);
-    console.log('🔄 Currently recording:', isRecording);
-    
-    // Simple permission check
-    if (!cameraPermission?.granted) {
-      console.log('❌ Camera permission not granted');
-      Alert.alert('خطأ', 'يجب منح إذن الكاميرا أولاً');
-      return;
-    }
-    
-    if (!microphonePermission?.granted) {
-      console.log('❌ Microphone permission not granted');
-      Alert.alert('خطأ', 'يجب منح إذن الميكروفون أولاً');
-      return;
-    }
-    
-    if (!cameraRef.current) {
-      console.log('❌ Camera ref is null');
-      Alert.alert('خطأ', 'الكاميرا غير جاهزة');
-      return;
-    }
-    
-    try {
-      console.log('🔴 Setting recording state to true...');
-      setIsRecording(true);
-      
-      console.log('🎥 Calling cameraRef.current.recordAsync()...');
-      const video = await cameraRef.current.recordAsync();
-      
-      console.log('✅ Recording completed successfully!');
-      console.log('📹 Video object:', video);
-      
-      if (video?.uri) {
-        console.log('🎯 Video URI exists:', video.uri);
-        Alert.alert('نجح!', 'تم تسجيل الفيديو بنجاح');
-        await handleVideoRecorded(video.uri);
-      } else {
-        console.log('❌ No video URI in result');
-        Alert.alert('خطأ', 'لم يتم إنشاء ملف الفيديو');
-      }
-      
-    } catch (error) {
-      console.log('❌ Recording error:', error);
-      Alert.alert('خطأ', `فشل التسجيل: ${error.message}`);
-    } finally {
-      console.log('🔄 Setting recording state to false...');
-      setIsRecording(false);
-    }
-  };
-
-  const stopRecording = () => {
-    console.log('🛑 Stopping recording...');
-    if (cameraRef.current && isRecording) {
-      cameraRef.current.stopRecording();
-      
-      // Clear timer
-      if (recordingTimer) {
-        clearTimeout(recordingTimer);
-        setRecordingTimer(null);
-      }
-    }
-  };
-
   const handleVideoRecorded = async (videoUri: string) => {
     try {
       setUploadingVideo(true);
 
-      // Get location data
       const location = await getCurrentLocation();
-      
-      // Get phone number
       const phoneNumber = await getDevicePhoneNumber();
 
-      // Convert video to base64
       const response = await fetch(videoUri);
       const blob = await response.blob();
       const reader = new FileReader();
@@ -200,7 +112,6 @@ export default function CameraScreen() {
         try {
           const base64Data = reader.result as string;
           
-          // Upload to backend
           await uploadVideo({
             video_data: base64Data,
             location_lat: location?.latitude || null,
@@ -208,15 +119,11 @@ export default function CameraScreen() {
             phone_number: phoneNumber,
           });
 
-          Alert.alert(
-            'Success!', 
-            'Video recorded and uploaded successfully',
-            [{ text: 'OK' }]
-          );
+          Alert.alert('نجح!', 'تم تسجيل ورفع الفيديو بنجاح');
           
         } catch (error) {
           console.error('Upload error:', error);
-          Alert.alert('Upload Error', 'Failed to upload video');
+          Alert.alert('خطأ في الرفع', 'فشل في رفع الفيديو');
         } finally {
           setUploadingVideo(false);
         }
@@ -226,7 +133,7 @@ export default function CameraScreen() {
       
     } catch (error) {
       console.error('Error processing video:', error);
-      Alert.alert('Error', 'Failed to process video');
+      Alert.alert('خطأ', 'فشل في معالجة الفيديو');
       setUploadingVideo(false);
     }
   };
@@ -251,128 +158,146 @@ export default function CameraScreen() {
     return response.json();
   };
 
+  const startRecording = async () => {
+    console.log('🎬 === START RECORDING FUNCTION CALLED ===');
+    
+    if (!cameraPermission?.granted) {
+      Alert.alert('خطأ', 'يجب منح إذن الكاميرا أولاً');
+      return;
+    }
+    
+    if (!microphonePermission?.granted) {
+      Alert.alert('خطأ', 'يجب منح إذن الميكروفون أولاً');
+      return;
+    }
+    
+    if (!cameraRef.current) {
+      Alert.alert('خطأ', 'الكاميرا غير جاهزة');
+      return;
+    }
+
+    try {
+      console.log('🔴 Setting recording state to true...');
+      setIsRecording(true);
+      
+      console.log('🎥 Calling recordAsync...');
+      const video = await cameraRef.current.recordAsync();
+      
+      console.log('✅ Recording completed successfully!');
+      
+      if (video?.uri) {
+        console.log('🎯 Video URI exists:', video.uri);
+        await handleVideoRecorded(video.uri);
+      } else {
+        Alert.alert('خطأ', 'لم يتم إنشاء ملف الفيديو');
+      }
+      
+    } catch (error) {
+      console.log('❌ Recording error:', error);
+      Alert.alert('خطأ', `فشل التسجيل: ${error.message}`);
+    } finally {
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (cameraRef.current && isRecording) {
+      cameraRef.current.stopRecording();
+    }
+  };
+
+  // Test button handler
+  const handleTestPress = () => {
+    console.log('🔵 TEST BUTTON PRESSED SUCCESSFULLY!');
+    Alert.alert('اختبار', 'الزر يعمل بشكل مثالي! 🎉');
+  };
+
   if (cameraPermission === null) {
     return (
-      <View style={styles.permissionContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.permissionText}>Requesting permissions...</Text>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>طلب الأذونات...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (!cameraPermission?.granted) {
     return (
-      <View style={styles.permissionContainer}>
-        <Ionicons name="camera-outline" size={64} color="#ccc" />
-        <Text style={styles.permissionText}>No access to camera</Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={getPermissions}>
-          <Text style={styles.permissionButtonText}>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <Ionicons name="camera-outline" size={64} color="#ccc" />
+          <Text style={styles.permissionText}>لا يمكن الوصول للكاميرا</Text>
+          <TouchableOpacity style={styles.permissionButton} onPress={getPermissions}>
+            <Text style={styles.permissionButtonText}>منح الأذونات</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Camera View */}
       <View style={styles.cameraContainer}>
         <CameraView 
           ref={cameraRef}
           style={styles.camera} 
           facing={type}
           mode="video"
-          videoQuality="720p"
-          pointerEvents="none"
-        >
-          <View style={styles.overlay}>
-            {/* Top Controls */}
-            <View style={styles.topControls}>
-              <TouchableOpacity
-                style={styles.flipButton}
-                onPress={() => setType(type === 'back' ? 'front' : 'back')}
-              >
-                <Ionicons name="camera-reverse-outline" size={32} color="white" />
-              </TouchableOpacity>
-            </View>
+        />
+        
+        {/* Camera Overlay */}
+        <View style={styles.overlay}>
+          {/* Flip Camera Button */}
+          <TouchableOpacity
+            style={styles.flipButton}
+            onPress={() => setType(type === 'back' ? 'front' : 'back')}
+          >
+            <Ionicons name="camera-reverse-outline" size={28} color="white" />
+          </TouchableOpacity>
 
-            {/* Status Indicators */}
-            <View style={styles.statusContainer}>
-              {locationPermission ? (
-                <View style={styles.statusItem}>
-                  <Ionicons name="location" size={16} color="#4CAF50" />
-                  <Text style={styles.statusText}>Location ON</Text>
-                </View>
-              ) : (
-                <View style={styles.statusItem}>
-                  <Ionicons name="location-outline" size={16} color="#FF9800" />
-                  <Text style={styles.statusText}>Location OFF</Text>
-                </View>
-              )}
+          {/* Recording Indicator */}
+          {isRecording && (
+            <View style={styles.recordingIndicator}>
+              <View style={styles.recordingDot} />
+              <Text style={styles.recordingText}>تسجيل</Text>
             </View>
-
-            {/* Recording Indicator */}
-            {isRecording && (
-              <View style={styles.recordingIndicator}>
-                <View style={styles.recordingDot} />
-                <Text style={styles.recordingText}>REC</Text>
-              </View>
-            )}
-          </View>
-        </CameraView>
+          )}
+        </View>
       </View>
 
-      {/* Bottom Controls - OUTSIDE CameraView */}
-      <View style={styles.bottomControlsExternal}>
+      {/* Bottom Controls - Outside Camera */}
+      <View style={styles.controlsSection}>
         {uploadingVideo ? (
           <View style={styles.uploadingContainer}>
             <ActivityIndicator size="large" color="#FF4444" />
             <Text style={styles.uploadingText}>جاري رفع الفيديو...</Text>
           </View>
         ) : (
-          <View style={styles.controlsContainer}>
+          <>
             {/* Test Button */}
             <TouchableOpacity 
               style={styles.testButton}
-              onPress={() => {
-                console.log('🔵 TEST BUTTON PRESSED!');
-                Alert.alert('اختبار', 'الزر يعمل بشكل صحيح!');
-              }}
-              onPressIn={() => console.log('🔵 TEST BUTTON PRESS IN!')}
-              onPressOut={() => console.log('🔵 TEST BUTTON PRESS OUT!')}
-              onTouchStart={() => console.log('🔵 TEST BUTTON TOUCH START!')}
-              onTouchEnd={() => console.log('🔵 TEST BUTTON TOUCH END!')}
-              activeOpacity={0.6}
+              onPress={handleTestPress}
             >
-              <Text style={styles.testButtonText}>اختبار</Text>
+              <Text style={styles.testButtonText}>اختبار الزر</Text>
             </TouchableOpacity>
             
             {/* Record Button */}
             <TouchableOpacity
-              style={[styles.recordButton, isRecording && styles.recordingButton]}
-              onPress={() => {
-                console.log('🔴 RECORD BUTTON PRESSED!');
-                Alert.alert('تسجيل', 'تم الضغط على زر التسجيل!');
-                if (isRecording) {
-                  console.log('🛑 Stopping recording...');
-                  stopRecording();
-                } else {
-                  console.log('🎬 Starting recording...');
-                  startRecording();
-                }
-              }}
-              onPressIn={() => console.log('🔴 RECORD BUTTON PRESS IN!')}
-              onPressOut={() => console.log('🔴 RECORD BUTTON PRESS OUT!')}
-              onTouchStart={() => console.log('🔴 RECORD BUTTON TOUCH START!')}
-              onTouchEnd={() => console.log('🔴 RECORD BUTTON TOUCH END!')}
-              activeOpacity={0.7}
+              style={[styles.recordButton, isRecording && styles.recordingActive]}
+              onPress={isRecording ? stopRecording : startRecording}
             >
-              <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
+              <View style={[styles.recordInner, isRecording && styles.recordInnerActive]} />
             </TouchableOpacity>
             
-            {/* Info Text */}
-            <Text style={styles.infoText}>
-              {isRecording ? 'اضغط لإيقاف التسجيل' : 'اضغط للبدء بالتسجيل'}
+            {/* Status Text */}
+            <Text style={styles.statusText}>
+              {isRecording ? 'اضغط لإيقاف التسجيل' : 'اضغط لبدء التسجيل'}
             </Text>
-          </View>
+          </>
         )}
       </View>
     </SafeAreaView>
