@@ -281,6 +281,7 @@ export default function CameraScreen() {
           facing={type}
           mode="video"
           videoQuality="720p"
+          pointerEvents="none"
         >
           <View style={styles.overlay}>
             {/* Top Controls */}
