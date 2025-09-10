@@ -606,17 +606,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'white',
   },
-  testButton: {
-    backgroundColor: 'rgba(0, 122, 255, 0.8)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  testButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
   uploadingContainer: {
     alignItems: 'center',
   },
@@ -624,5 +613,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginTop: 8,
+    textAlign: 'center',
   },
 });
