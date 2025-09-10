@@ -336,6 +336,11 @@ export default function CameraScreen() {
                 console.log('🔵 TEST BUTTON PRESSED!');
                 Alert.alert('اختبار', 'الزر يعمل بشكل صحيح!');
               }}
+              onPressIn={() => console.log('🔵 TEST BUTTON PRESS IN!')}
+              onPressOut={() => console.log('🔵 TEST BUTTON PRESS OUT!')}
+              onTouchStart={() => console.log('🔵 TEST BUTTON TOUCH START!')}
+              onTouchEnd={() => console.log('🔵 TEST BUTTON TOUCH END!')}
+              activeOpacity={0.6}
             >
               <Text style={styles.testButtonText}>اختبار</Text>
             </TouchableOpacity>
@@ -354,6 +359,10 @@ export default function CameraScreen() {
                   startRecording();
                 }
               }}
+              onPressIn={() => console.log('🔴 RECORD BUTTON PRESS IN!')}
+              onPressOut={() => console.log('🔴 RECORD BUTTON PRESS OUT!')}
+              onTouchStart={() => console.log('🔴 RECORD BUTTON TOUCH START!')}
+              onTouchEnd={() => console.log('🔴 RECORD BUTTON TOUCH END!')}
               activeOpacity={0.7}
             >
               <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
